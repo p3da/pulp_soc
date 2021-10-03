@@ -123,3 +123,6 @@ riscv-dbg:
 register_interface:
   commit: v0.3.1
   domain: [soc]
+pulpissimo-wide-alu:
+  commit: main
+  group: p3da
