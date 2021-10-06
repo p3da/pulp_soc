@@ -121,5 +121,5 @@ register_interface:
   commit: v0.3.1
   domain: [soc]
 wide_alu_ip:
-  commit: wide_alu_ip
+  commit: wide_alu_pulp_soc_v3.0.1
   group: p3da
