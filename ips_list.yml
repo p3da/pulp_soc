@@ -120,3 +120,6 @@ riscv-dbg:
 register_interface:
   commit: v0.3.1
   domain: [soc]
+wide_alu_ipV2:
+  commit: fullstack_ip_integration
+  group: p3da
