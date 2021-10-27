@@ -123,3 +123,8 @@ riscv-dbg:
 register_interface:
   commit: v0.3.1
   domain: [soc]
+dummy_vip:
+  commit: master
+  domain: [soc]
+  server: git:github.com
+  group: p3da
