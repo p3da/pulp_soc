@@ -126,5 +126,5 @@ register_interface:
 dummy_vip:
   commit: master
   domain: [soc]
-  server: git:github.com
+  server: git@github.com
   group: p3da
