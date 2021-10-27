@@ -1004,6 +1004,13 @@ module pulp_soc import dm::*; #(
         .per_master_r_rdata_i ( dm_slave_rdata             )
      );
 
+
+     dummy_top #(
+
+     ) dummy_top_i (
+
+     ):
+
      assign slave_grant = dm_slave_req;
      always_ff @(posedge s_soc_clk or negedge s_soc_rstn) begin : apb2per_valid
          if(~s_soc_rstn) begin
