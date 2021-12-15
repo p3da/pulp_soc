@@ -123,3 +123,7 @@ riscv-dbg:
 register_interface:
   commit: v0.3.1
   domain: [soc]
+verilog-ethernet:
+  commit: esp
+  domain: [soc]
+  group: p3da
