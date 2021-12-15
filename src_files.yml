@@ -95,3 +95,27 @@ components_behav:
   flags: [
     skip_synthesis,
   ]
+
+verilog-ethernet:
+  files: [
+    rtl/ptp_clock.v,
+    lib/axis/rtl/axis_fifo.v,
+    rtl/ptp_clock_cdc.v,
+    rtl/ptp_ts_extract.v,
+    rtl/iddr.v,
+    rtl/ssio_ddr_in.v,
+    rtl/lfsr.v,
+    rtl/oddr.v,
+    rtl/axis_gmii_rx.v,
+    rtl/axis_gmii_tx.v,
+    rtl/rgmii_phy_if.v,
+    rtl/eth_mac_1g.v,
+    rtl/eth_mac_1g_rgmii.v,
+    lib/axis/rtl/axis_async_fifo.v,
+    lib/axis/rtl/axis_async_fifo_adapter.v,
+    rtl/eth_mac_1g_rgmii_fifo.v,
+    rtl/eth_axis_tx.v,
+    rtl/eth_axis_rx.v,
+    rtl/ptp_clock.v,
+    rtl/ptp_perout.v
+  ]
