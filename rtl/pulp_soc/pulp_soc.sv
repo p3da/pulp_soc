@@ -207,8 +207,18 @@ module pulp_soc import dm::*; #(
     input logic                           jtag_tms_i,
     input logic                           jtag_tdi_i,
     output logic                          jtag_tdo_o,
-    output logic [NB_CORES-1:0]           cluster_dbg_irq_valid_o
+    output logic [NB_CORES-1:0]           cluster_dbg_irq_valid_o,
     ///////////////////////////////////////////////////
+
+		input logic       	phy_rx_clk,
+		input logic [3:0] 	phy_rxd,
+		input logic      		phy_rx_ctl,
+		output logic       	phy_tx_clk,
+		output logic [3:0] 	phy_txd,
+		output logic       	phy_tx_ctl,
+		output logic       	phy_reset_n,
+
+		input logic         ref_clk90_i
 );
 
     localparam NB_L2_BANKS = `NB_L2_CHANNELS;
@@ -1034,5 +1044,31 @@ module pulp_soc import dm::*; #(
             assign pad_cfg_o[j+6*i] = s_pad_cfg[i][j];
         end
     end
+
+
+		udp_complete_wrapper #(
+			.TARGET("XILINX")
+		) udp_complete_wrapper_i (
+			/*
+			 * Clock: 125MHz
+			 * Synchronous reset
+			 */
+			.clk_125mhz(ref_clk_i),
+			.clk90_125mhz(ref_clk90_i),
+			.rst_125mhz(rstn_glob_i),
+
+			/*
+	     * Ethernet: 1000BASE-T RGMII
+	     */
+	    .phy_rx_clk(phy_rx_clk),
+	    .phy_rxd(phy_rxd),
+	    .phy_rx_ctl(phy_rx_ctl),
+	    .phy_tx_clk(phy_tx_clk),
+	    .phy_txd(phy_txd),
+	    .phy_tx_ctl(phy_tx_ctl),
+	    .phy_reset_n(phy_reset_n),
+	    /*
+
+		);
 
 endmodule
