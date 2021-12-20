@@ -1066,8 +1066,7 @@ module pulp_soc import dm::*; #(
 	    .phy_tx_clk(phy_tx_clk),
 	    .phy_txd(phy_txd),
 	    .phy_tx_ctl(phy_tx_ctl),
-	    .phy_reset_n(phy_reset_n),
-	    /*
+	    .phy_reset_n(phy_reset_n)
 
 		);
 
