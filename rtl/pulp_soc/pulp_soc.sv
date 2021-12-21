@@ -218,7 +218,9 @@ module pulp_soc import dm::*; #(
 		output logic       	phy_tx_ctl,
 		output logic       	phy_reset_n,
 
-		input logic         ref_clk90_i
+		input logic         ref_clk90_i,
+
+		output logic [7:0]  led
 );
 
     localparam NB_L2_BANKS = `NB_L2_CHANNELS;
@@ -1047,27 +1049,31 @@ module pulp_soc import dm::*; #(
 
 
 		udp_complete_wrapper #(
-			.TARGET("GENERIC")
+				.TARGET("XILINX")
 		) udp_complete_wrapper_i (
-			/*
-			 * Clock: 125MHz
-			 * Synchronous reset
-			 */
-			.clk_125mhz(ref_clk_i),
-			.clk90_125mhz(ref_clk90_i),
-			.rst_125mhz(rstn_glob_i),
+				/*
+				 * Clock: 125MHz
+				 * Synchronous reset
+				 */
+				.clk_125mhz(ref_clk_i),
+				.clk90_125mhz(ref_clk90_i),
+				.rst_125mhz(rstn_glob_i),
 
-			/*
-	     * Ethernet: 1000BASE-T RGMII
-	     */
-	    .phy_rx_clk(phy_rx_clk),
-	    .phy_rxd(phy_rxd),
-	    .phy_rx_ctl(phy_rx_ctl),
-	    .phy_tx_clk(phy_tx_clk),
-	    .phy_txd(phy_txd),
-	    .phy_tx_ctl(phy_tx_ctl),
-	    .phy_reset_n(phy_reset_n)
+				/**
+				 * payload of udp packets is printed to leds
+				 */
+				.led(led);
 
+				/*
+		     * Ethernet: 1000BASE-T RGMII
+		     */
+		    .phy_rx_clk(phy_rx_clk),
+		    .phy_rxd(phy_rxd),
+		    .phy_rx_ctl(phy_rx_ctl),
+		    .phy_tx_clk(phy_tx_clk),
+		    .phy_txd(phy_txd),
+		    .phy_tx_ctl(phy_tx_ctl),
+		    .phy_reset_n(phy_reset_n)
 		);
 
 endmodule
