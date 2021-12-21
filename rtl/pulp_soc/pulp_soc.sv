@@ -1062,7 +1062,7 @@ module pulp_soc import dm::*; #(
 				/**
 				 * payload of udp packets is printed to leds
 				 */
-				.led(led);
+				.led(led),
 
 				/*
 		     * Ethernet: 1000BASE-T RGMII
