@@ -1049,7 +1049,7 @@ module pulp_soc import dm::*; #(
 
 
 		udp_complete_wrapper #(
-				.TARGET("GENERIC")
+				.TARGET("XILINX")
 		) udp_complete_wrapper_i (
 				/*
 				 * Clock: 125MHz
