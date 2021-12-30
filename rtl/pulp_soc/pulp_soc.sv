@@ -218,7 +218,9 @@ module pulp_soc import dm::*; #(
 		output logic       	phy_tx_ctl,
 		output logic       	phy_reset_n,
 
-		input logic         ref_clk90_i,
+    input logic         clk_eth,
+    input logic         clk_eth90,
+    input logic         rst_eth,
 
 		output logic [7:0]  led
 );
@@ -1048,16 +1050,23 @@ module pulp_soc import dm::*; #(
     end
 
 
+    // set target XILINX if design is systhesized or GENERIC for simulation
+    `ifdef PULP_FPGA_EMUL
+        parameter MAC_TARGET = "XILINX";
+    `else
+        parameter MAC_TARGET = "GENERIC";
+    `endif
+
 		udp_complete_wrapper #(
-				.TARGET("XILINX")
+				.TARGET(MAC_TARGET)
 		) udp_complete_wrapper_i (
 				/*
 				 * Clock: 125MHz
 				 * Synchronous reset
 				 */
-				.clk_125mhz(ref_clk_i),
-				.clk90_125mhz(ref_clk90_i),
-				.rst_125mhz(rstn_glob_i),
+				.clk_125mhz(clk_eth),
+				.clk90_125mhz(clk_eth90),
+				.rst_125mhz(rst_eth),
 
 				/**
 				 * payload of udp packets is printed to leds
