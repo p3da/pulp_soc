@@ -367,6 +367,19 @@ module pulp_soc import dm::*; #(
     logic                  s_jtag_axireg_tdi;
     logic                  s_jtag_axireg_tdo;
 
+    // udma <-> ethernet mac
+    logic [7:0] eth_tx_axis_tdata;
+    logic eth_tx_axis_tvalid;
+    logic eth_tx_axis_tready;
+    logic eth_tx_axis_tlast;
+    logic eth_tx_axis_tuser;
+
+    logic [7:0] eth_rx_axis_tdata;
+    logic eth_rx_axis_tvalid;
+    logic eth_rx_axis_tready;
+    logic eth_rx_axis_tlast;
+    logic eth_rx_axis_tuser;
+
 
     APB_BUS                s_apb_eu_bus ();
     APB_BUS                s_apb_hwpe_bus ();
@@ -1097,18 +1110,6 @@ module pulp_soc import dm::*; #(
 		//     .phy_tx_ctl(phy_tx_ctl),
 		//     .phy_reset_n(phy_reset_n)
 		// );
-
-    logic [7:0] eth_tx_axis_tdata;
-    logic eth_tx_axis_tvalid;
-    logic eth_tx_axis_tready;
-    logic eth_tx_axis_tlast;
-    logic eth_tx_axis_tuser;
-
-    logic [7:0] eth_rx_axis_tdata;
-    logic eth_rx_axis_tvalid;
-    logic eth_rx_axis_tready;
-    logic eth_rx_axis_tlast;
-    logic eth_rx_axis_tuser;
 
     eth_mac_1g_rgmii_fifo #(
         .TARGET(MAC_TARGET),
