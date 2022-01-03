@@ -124,6 +124,6 @@ register_interface:
   commit: v0.3.1
   domain: [soc]
 verilog-ethernet:
-  commit: udpcomplete
+  commit: udpcomplete_v0
   domain: [soc]
   group: p3da
