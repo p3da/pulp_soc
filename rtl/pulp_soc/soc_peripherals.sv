@@ -164,7 +164,19 @@ module soc_peripherals #(
     output logic                [63:0] cluster_boot_addr_o,
     output logic                       cluster_fetch_enable_o,
     output logic                       cluster_rstn_o,
-    output logic                       cluster_irq_o
+    output logic                       cluster_irq_o,
+
+    output logic [7:0] eth_tx_axis_tdata,
+    output logic eth_tx_axis_tvalid,
+    input  logic eth_tx_axis_tready,
+    output logic eth_tx_axis_tlast,
+    output logic eth_tx_axis_tuser,
+
+    input  logic [7:0] eth_rx_axis_tdata,
+    input  logic eth_rx_axis_tvalid,
+    output logic eth_rx_axis_tready,
+    input  logic eth_rx_axis_tlast,
+    input  logic eth_rx_axis_tuser
 );
 
     APB_BUS s_fll_bus ();
@@ -490,7 +502,20 @@ module soc_peripherals #(
         .hyper_dq_i       ( hyper_dq_i           ),
         .hyper_dq_o       ( hyper_dq_o           ),
         .hyper_dq_oe_o    ( hyper_dq_oe_o        ),
-        .hyper_reset_no   ( hyper_reset_no       )
+        .hyper_reset_no   ( hyper_reset_no       ),
+
+        // udma <-> ethernet mac
+        .eth_tx_axis_tdata(eth_tx_axis_tdata),
+        .eth_tx_axis_tvalid(eth_tx_axis_tvalid),
+        .eth_tx_axis_tready(eth_tx_axis_tready),
+        .eth_tx_axis_tlast(eth_tx_axis_tlast),
+        .eth_tx_axis_tuser(eth_tx_axis_tuser),
+
+        .eth_rx_axis_tdata(eth_rx_axis_tdata),
+        .eth_rx_axis_tvalid(eth_rx_axis_tvalid),
+        .eth_rx_axis_tready(eth_rx_axis_tready),
+        .eth_rx_axis_tlast(eth_rx_axis_tlast),
+        .eth_rx_axis_tuser(eth_rx_axis_tuser)
 
     );
 

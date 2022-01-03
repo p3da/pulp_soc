@@ -726,7 +726,20 @@ module pulp_soc import dm::*; #(
         .cluster_boot_addr_o    ( cluster_boot_addr_o    ),
         .cluster_fetch_enable_o ( cluster_fetch_enable_o ),
         .cluster_rstn_o         ( s_cluster_rstn_soc_ctrl),
-        .cluster_irq_o          ( cluster_irq_o          )
+        .cluster_irq_o          ( cluster_irq_o          ),
+
+        // udma <-> ethernet mac
+        .eth_tx_axis_tdata(eth_tx_axis_tdata),
+        .eth_tx_axis_tvalid(eth_tx_axis_tvalid),
+        .eth_tx_axis_tready(eth_tx_axis_tready),
+        .eth_tx_axis_tlast(eth_tx_axis_tlast),
+        .eth_tx_axis_tuser(eth_tx_axis_tuser),
+
+        .eth_rx_axis_tdata(eth_rx_axis_tdata),
+        .eth_rx_axis_tvalid(eth_rx_axis_tvalid),
+        .eth_rx_axis_tready(eth_rx_axis_tready),
+        .eth_rx_axis_tlast(eth_rx_axis_tlast),
+        .eth_rx_axis_tuser(eth_rx_axis_tuser)
 
     );
 
@@ -1057,32 +1070,94 @@ module pulp_soc import dm::*; #(
         parameter MAC_TARGET = "GENERIC";
     `endif
 
-		udp_complete_wrapper #(
-				.TARGET(MAC_TARGET)
-		) udp_complete_wrapper_i (
-				/*
-				 * Clock: 125MHz
-				 * Synchronous reset
-				 */
-				.clk_125mhz(clk_eth),
-				.clk90_125mhz(clk_eth90),
-				.rst_125mhz(rst_eth),
+		// udp_complete_wrapper #(
+		// 		.TARGET(MAC_TARGET)
+		// ) udp_complete_wrapper_i (
+		// 		/*
+		// 		 * Clock: 125MHz
+		// 		 * Synchronous reset
+		// 		 */
+		// 		.clk_125mhz(clk_eth),
+		// 		.clk90_125mhz(clk_eth90),
+		// 		.rst_125mhz(rst_eth),
+    //
+		// 		/**
+		// 		 * payload of udp packets is printed to leds
+		// 		 */
+		// 		.led(led),
+    //
+		// 		/*
+		//      * Ethernet: 1000BASE-T RGMII
+		//      */
+		//     .phy_rx_clk(phy_rx_clk),
+		//     .phy_rxd(phy_rxd),
+		//     .phy_rx_ctl(phy_rx_ctl),
+		//     .phy_tx_clk(phy_tx_clk),
+		//     .phy_txd(phy_txd),
+		//     .phy_tx_ctl(phy_tx_ctl),
+		//     .phy_reset_n(phy_reset_n)
+		// );
 
-				/**
-				 * payload of udp packets is printed to leds
-				 */
-				.led(led),
+    logic [7:0] eth_tx_axis_tdata;
+    logic eth_tx_axis_tvalid;
+    logic eth_tx_axis_tready;
+    logic eth_tx_axis_tlast;
+    logic eth_tx_axis_tuser;
 
-				/*
-		     * Ethernet: 1000BASE-T RGMII
-		     */
-		    .phy_rx_clk(phy_rx_clk),
-		    .phy_rxd(phy_rxd),
-		    .phy_rx_ctl(phy_rx_ctl),
-		    .phy_tx_clk(phy_tx_clk),
-		    .phy_txd(phy_txd),
-		    .phy_tx_ctl(phy_tx_ctl),
-		    .phy_reset_n(phy_reset_n)
-		);
+    logic [7:0] eth_rx_axis_tdata;
+    logic eth_rx_axis_tvalid;
+    logic eth_rx_axis_tready;
+    logic eth_rx_axis_tlast;
+    logic eth_rx_axis_tuser;
+
+    eth_mac_1g_rgmii_fifo #(
+        .TARGET(MAC_TARGET),
+        .IODDR_STYLE("IODDR"),
+        .CLOCK_INPUT_STYLE("BUFR"),
+        .USE_CLK90("TRUE"),
+        .ENABLE_PADDING(1),
+        .MIN_FRAME_LENGTH(64),
+        .TX_FIFO_DEPTH(4096),
+        .TX_FRAME_FIFO(1),
+        .RX_FIFO_DEPTH(4096),
+        .RX_FRAME_FIFO(1)
+    ) eth_mac_inst (
+        .gtx_clk(clk_eth),
+        .gtx_clk90(clk_eth90),
+        .gtx_rst(rst_eth),
+        .logic_clk(clk_eth),
+        .logic_rst(rst_eth),
+
+        .tx_axis_tdata(eth_tx_axis_tdata),
+        .tx_axis_tvalid(eth_tx_axis_tvalid),
+        .tx_axis_tready(eth_tx_axis_tready),
+        .tx_axis_tlast(eth_tx_axis_tlast),
+        .tx_axis_tuser(eth_tx_axis_tuser),
+
+        .rx_axis_tdata(eth_rx_axis_tdata),
+        .rx_axis_tvalid(eth_rx_axis_tvalid),
+        .rx_axis_tready(eth_rx_axis_tready),
+        .rx_axis_tlast(eth_rx_axis_tlast),
+        .rx_axis_tuser(eth_rx_axis_tuser),
+
+        .rgmii_rx_clk(phy_rx_clk),
+        .rgmii_rxd(phy_rxd),
+        .rgmii_rx_ctl(phy_rx_ctl),
+        .rgmii_tx_clk(phy_tx_clk),
+        .rgmii_txd(phy_txd),
+        .rgmii_tx_ctl(phy_tx_ctl),
+
+        .tx_fifo_overflow(),
+        .tx_fifo_bad_frame(),
+        .tx_fifo_good_frame(),
+        .rx_error_bad_frame(),
+        .rx_error_bad_fcs(),
+        .rx_fifo_overflow(),
+        .rx_fifo_bad_frame(),
+        .rx_fifo_good_frame(),
+        .speed(),
+
+        .ifg_delay(12)
+    );
 
 endmodule

@@ -111,6 +111,10 @@ udma/udma_filter:
 udma/udma_external_per:
   commit: v1.0.3
   domain: [soc]
+udma/udma_eth_frame:
+  commit: master
+  domain: [soc]
+  group: p3da
 udma_hyper:
   commit: 83ab704f9d1c5f9e5353268c901fe95c36bcea36
   domain: [soc]
