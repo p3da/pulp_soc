@@ -145,22 +145,17 @@ module udma_subsystem
     localparam N_FILTER   = 1;
     localparam N_CH_HYPER = 8;
     localparam N_FPGA     = 0;
-`ifdef PULP_TRAINING
-    localparam N_EXT_PER  = 1;
-`else
-    localparam N_EXT_PER  = 0;
-`endif
     localparam N_ETH_FRAME = 1;
 
-    localparam N_RX_CHANNELS =   N_SPI + N_HYPER + N_MRAM + N_JTAG + N_SDIO + N_UART + N_I2C + N_I2S + N_CAM + 2*N_CSI2 + N_FPGA + N_EXT_PER + N_CH_HYPER + N_ETH_FRAME;
-    localparam N_TX_CHANNELS = 2*N_SPI + N_HYPER + N_MRAM + N_JTAG + N_SDIO + N_UART + 2*N_I2C + N_I2S + N_FPGA + N_EXT_PER + N_CH_HYPER + N_ETH_FRAME;
+    localparam N_RX_CHANNELS =   N_SPI + N_HYPER + N_MRAM + N_JTAG + N_SDIO + N_UART + N_I2C + N_I2S + N_CAM + 2*N_CSI2 + N_FPGA + N_CH_HYPER + N_ETH_FRAME;
+    localparam N_TX_CHANNELS = 2*N_SPI + N_HYPER + N_MRAM + N_JTAG + N_SDIO + N_UART + 2*N_I2C + N_I2S + N_CAM +N_FPGA + N_CH_HYPER + N_ETH_FRAME;
 
     localparam N_RX_EXT_CHANNELS =   N_FILTER;
     localparam N_TX_EXT_CHANNELS = 2*N_FILTER;
     localparam N_STREAMS         =   N_FILTER;
     localparam STREAM_ID_WIDTH   = 1;//$clog2(N_STREAMS)
 
-    localparam N_PERIPHS = N_SPI + N_HYPER + N_UART + N_MRAM + N_I2C + N_CAM + N_I2S + N_CSI2 + N_SDIO + N_JTAG + N_FILTER + N_FPGA + N_EXT_PER + N_CH_HYPER + N_ETH_FRAME;
+    localparam N_PERIPHS = N_SPI + N_HYPER + N_UART + N_MRAM + N_I2C + N_CAM + N_I2S + N_CSI2 + N_SDIO + N_JTAG + N_FILTER + N_FPGA + N_CH_HYPER + N_ETH_FRAME;
 
     // TX Channels
     localparam CH_ID_TX_UART    = 0;
@@ -172,9 +167,7 @@ module udma_subsystem
     localparam CH_ID_TX_I2S     = CH_ID_TX_SDIO  + N_SDIO ;
     localparam CH_ID_TX_CAM     = CH_ID_TX_I2S   + N_I2S  ;
     localparam CH_ID_TX_HYPER   = CH_ID_TX_CAM   + N_CAM  ;
-    // Tx Ext Channel
-    localparam CH_ID_TX_EXT_PER = CH_ID_TX_HYPER + N_HYPER + N_CH_HYPER;
-    localparam CH_ID_TX_ETH_FRAME = CH_ID_TX_EXT_PER + N_EXT_PER;
+    localparam CH_ID_TX_ETH_FRAME = CH_ID_TX_HYPER + N_HYPER + N_CH_HYPER;
 
 
 
@@ -186,9 +179,7 @@ module udma_subsystem
     localparam CH_ID_RX_I2S     = CH_ID_RX_SDIO  + N_SDIO ;
     localparam CH_ID_RX_CAM     = CH_ID_RX_I2S   + N_I2S  ;
     localparam CH_ID_RX_HYPER   = CH_ID_RX_CAM   + N_CAM  ;
-    // Rx Ext Channel
-    localparam CH_ID_RX_EXT_PER = CH_ID_RX_HYPER + N_HYPER + N_CH_HYPER;
-    localparam CH_ID_RX_ETH_FRAME = CH_ID_RX_EXT_PER + N_EXT_PER;
+    localparam CH_ID_RX_ETH_FRAME = CH_ID_RX_HYPER + N_HYPER + N_CH_HYPER;
 
     // Stream Channel
     localparam STREAM_ID_FILTER = 0;
@@ -204,11 +195,24 @@ module udma_subsystem
     localparam PER_ID_CAM     = PER_ID_I2S    + N_I2S    ;
     localparam PER_ID_FILTER  = PER_ID_CAM    + N_CAM    ;
     localparam PER_ID_HYPER   = PER_ID_FILTER + N_FILTER ;
-    localparam PER_ID_EXT_PER = PER_ID_HYPER  + N_HYPER  + N_CH_HYPER;
-    localparam PER_ID_ETH_FRAME = PER_ID_EXT_PER + N_EXT_PER;
+    localparam PER_ID_ETH_FRAME =  PER_ID_HYPER  + N_HYPER  + N_CH_HYPER;
 
-
-
+    initial begin
+    $display("
+      [N_RX_CHANNELS]: %d\n,
+      [N_TX_CHANNELS]: %d\n,
+      [N_PERIPHS]: %d\n,
+      [CH_ID_TX_ETH_FRAME]: %d\n,
+      [CH_ID_RX_ETH_FRAME]: %d\n,
+      [PER_ID_ETH_FRAME]: %d",
+      N_RX_CHANNELS,
+      N_TX_CHANNELS,
+      N_PERIPHS,
+      CH_ID_TX_ETH_FRAME,
+      CH_ID_RX_ETH_FRAME,
+      PER_ID_ETH_FRAME
+    );
+    end
 
     logic [N_TX_CHANNELS-1:0] [L2_AWIDTH_NOAL-1 : 0] s_tx_cfg_startaddr;
     logic [N_TX_CHANNELS-1:0]     [TRANS_SIZE-1 : 0] s_tx_cfg_size;
@@ -1085,69 +1089,6 @@ module udma_subsystem
         //.debug_hyper_phy_state_o ( debug_hyper_phy_state_o                          )
     );
 
-
-`ifdef PULP_TRAINING
-    //PER_ID 9
-    assign s_events[4*PER_ID_EXT_PER]            = s_rx_ch_events[CH_ID_RX_EXT_PER];
-    assign s_events[4*PER_ID_EXT_PER+1]          = s_tx_ch_events[CH_ID_TX_EXT_PER];
-    assign s_events[4*PER_ID_EXT_PER+2]          = 1'b0;
-    assign s_events[4*PER_ID_EXT_PER+3]          = 1'b0;
-
-    assign s_rx_cfg_stream[CH_ID_RX_EXT_PER]     = 'h0;
-    assign s_rx_cfg_stream_id[CH_ID_RX_EXT_PER]  = 'h0;
-    assign s_rx_ch_destination[CH_ID_RX_EXT_PER] = 'h0;
-    assign s_tx_ch_destination[CH_ID_TX_EXT_PER] = 'h0;
-
-    udma_external_per_wrapper #(
-      .L2_AWIDTH_NOAL(L2_AWIDTH_NOAL),
-      .TRANS_SIZE(TRANS_SIZE)
-    ) i_external_per (
-        .sys_clk_i           ( s_clk_periphs_core[PER_ID_EXT_PER]    ),
-        .periph_clk_i        ( s_clk_periphs_per[PER_ID_EXT_PER]     ),
-        .rstn_i              ( sys_resetn_i                          ),
-
-        .cfg_data_i          ( s_periph_data_to                      ),
-        .cfg_addr_i          ( s_periph_addr                         ),
-        .cfg_valid_i         ( s_periph_valid[PER_ID_EXT_PER]        ),
-        .cfg_rwn_i           ( s_periph_rwn                          ),
-        .cfg_ready_o         ( s_periph_ready[PER_ID_EXT_PER]        ),
-        .cfg_data_o          ( s_periph_data_from[PER_ID_EXT_PER]    ),
-
-        .cfg_rx_startaddr_o  ( s_rx_cfg_startaddr[CH_ID_RX_EXT_PER]  ),
-        .cfg_rx_size_o       ( s_rx_cfg_size[CH_ID_RX_EXT_PER]       ),
-        .cfg_rx_continuous_o ( s_rx_cfg_continuous[CH_ID_RX_EXT_PER] ),
-        .cfg_rx_en_o         ( s_rx_cfg_en[CH_ID_RX_EXT_PER]         ),
-        .cfg_rx_clr_o        ( s_rx_cfg_clr[CH_ID_RX_EXT_PER]        ),
-        .cfg_rx_en_i         ( s_rx_ch_en[CH_ID_RX_EXT_PER]          ),
-        .cfg_rx_pending_i    ( s_rx_ch_pending[CH_ID_RX_EXT_PER]     ),
-        .cfg_rx_curr_addr_i  ( s_rx_ch_curr_addr[CH_ID_RX_EXT_PER]   ),
-        .cfg_rx_bytes_left_i ( s_rx_ch_bytes_left[CH_ID_RX_EXT_PER]  ),
-
-        .cfg_tx_startaddr_o  ( s_tx_cfg_startaddr[CH_ID_TX_EXT_PER]  ),
-        .cfg_tx_size_o       ( s_tx_cfg_size[CH_ID_TX_EXT_PER]       ),
-        .cfg_tx_continuous_o ( s_tx_cfg_continuous[CH_ID_TX_EXT_PER] ),
-        .cfg_tx_en_o         ( s_tx_cfg_en[CH_ID_TX_EXT_PER]         ),
-        .cfg_tx_clr_o        ( s_tx_cfg_clr[CH_ID_TX_EXT_PER]        ),
-        .cfg_tx_en_i         ( s_tx_ch_en[CH_ID_TX_EXT_PER]          ),
-        .cfg_tx_pending_i    ( s_tx_ch_pending[CH_ID_TX_EXT_PER]     ),
-        .cfg_tx_curr_addr_i  ( s_tx_ch_curr_addr[CH_ID_TX_EXT_PER]   ),
-        .cfg_tx_bytes_left_i ( s_tx_ch_bytes_left[CH_ID_TX_EXT_PER]  ),
-
-        .data_tx_req_o       ( s_tx_ch_req[CH_ID_TX_EXT_PER]         ),
-        .data_tx_gnt_i       ( s_tx_ch_gnt[CH_ID_TX_EXT_PER]         ),
-        .data_tx_datasize_o  ( s_tx_ch_datasize[CH_ID_TX_EXT_PER]    ),
-        .data_tx_i           ( s_tx_ch_data[CH_ID_TX_EXT_PER]        ),
-        .data_tx_valid_i     ( s_tx_ch_valid[CH_ID_TX_EXT_PER]       ),
-        .data_tx_ready_o     ( s_tx_ch_ready[CH_ID_TX_EXT_PER]       ),
-
-        .data_rx_datasize_o  ( s_rx_ch_datasize[CH_ID_RX_EXT_PER]    ),
-        .data_rx_o           ( s_rx_ch_data[CH_ID_RX_EXT_PER]        ),
-        .data_rx_valid_o     ( s_rx_ch_valid[CH_ID_RX_EXT_PER]       ),
-        .data_rx_ready_i     ( s_rx_ch_ready[CH_ID_RX_EXT_PER]       )
-    );
-`endif
-
-    //PER_ID 10
     assign s_events[4*PER_ID_ETH_FRAME]            = s_rx_ch_events[CH_ID_RX_ETH_FRAME];
     assign s_events[4*PER_ID_ETH_FRAME+1]          = s_tx_ch_events[CH_ID_TX_ETH_FRAME];
     assign s_events[4*PER_ID_ETH_FRAME+2]          = 1'b0;
