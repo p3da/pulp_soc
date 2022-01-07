@@ -176,7 +176,11 @@ module soc_peripherals #(
     input  logic eth_rx_axis_tvalid,
     output logic eth_rx_axis_tready,
     input  logic eth_rx_axis_tlast,
-    input  logic eth_rx_axis_tuser
+    input  logic eth_rx_axis_tuser,
+
+    input  logic clk_eth,
+    input  logic clk_eth90,
+    input  logic rst_eth
 );
 
     APB_BUS s_fll_bus ();
@@ -515,7 +519,11 @@ module soc_peripherals #(
         .eth_rx_axis_tvalid(eth_rx_axis_tvalid),
         .eth_rx_axis_tready(eth_rx_axis_tready),
         .eth_rx_axis_tlast(eth_rx_axis_tlast),
-        .eth_rx_axis_tuser(eth_rx_axis_tuser)
+        .eth_rx_axis_tuser(eth_rx_axis_tuser),
+
+        .clk_eth(eth_clk),
+        .clk_eth90(clk_eth90),
+        .rst_eth(rst_eth)
 
     );
 

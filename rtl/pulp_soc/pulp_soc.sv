@@ -752,7 +752,11 @@ module pulp_soc import dm::*; #(
         .eth_rx_axis_tvalid(eth_rx_axis_tvalid),
         .eth_rx_axis_tready(eth_rx_axis_tready),
         .eth_rx_axis_tlast(eth_rx_axis_tlast),
-        .eth_rx_axis_tuser(eth_rx_axis_tuser)
+        .eth_rx_axis_tuser(eth_rx_axis_tuser),
+
+        .clk_eth(eth_clk),
+        .clk_eth90(clk_eth90),
+        .rst_eth(rst_eth)
 
     );
 

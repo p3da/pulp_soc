@@ -128,7 +128,11 @@ module udma_subsystem
     input  logic eth_rx_axis_tvalid,
     output logic eth_rx_axis_tready,
     input  logic eth_rx_axis_tlast,
-    input  logic eth_rx_axis_tuser
+    input  logic eth_rx_axis_tuser,
+
+    input  logic clk_eth,
+    input  logic clk_eth90,
+    input  logic rst_eth
 
 );
 
@@ -1104,16 +1108,17 @@ module udma_subsystem
       .TRANS_SIZE(TRANS_SIZE)
     ) i_external_per (
         .sys_clk_i           ( s_clk_periphs_core[PER_ID_ETH_FRAME]    ),
-        .periph_clk_i        ( s_clk_periphs_per[PER_ID_ETH_FRAME]     ),
-        .rstn_i              ( sys_resetn_i                          ),
+        .rstn_i              ( sys_resetn_i                            ),
 
-        .cfg_data_i          ( s_periph_data_to                      ),
-        .cfg_addr_i          ( s_periph_addr                         ),
+        /* interface for configuration registers */
+        .cfg_data_i          ( s_periph_data_to                        ),
+        .cfg_addr_i          ( s_periph_addr                           ),
         .cfg_valid_i         ( s_periph_valid[PER_ID_ETH_FRAME]        ),
-        .cfg_rwn_i           ( s_periph_rwn                          ),
+        .cfg_rwn_i           ( s_periph_rwn                            ),
         .cfg_ready_o         ( s_periph_ready[PER_ID_ETH_FRAME]        ),
         .cfg_data_o          ( s_periph_data_from[PER_ID_ETH_FRAME]    ),
 
+        /* control and configuration signals between udma peripheral and udma core */
         .cfg_rx_startaddr_o  ( s_rx_cfg_startaddr[CH_ID_RX_ETH_FRAME]  ),
         .cfg_rx_size_o       ( s_rx_cfg_size[CH_ID_RX_ETH_FRAME]       ),
         .cfg_rx_continuous_o ( s_rx_cfg_continuous[CH_ID_RX_ETH_FRAME] ),
@@ -1134,6 +1139,7 @@ module udma_subsystem
         .cfg_tx_curr_addr_i  ( s_tx_ch_curr_addr[CH_ID_TX_ETH_FRAME]   ),
         .cfg_tx_bytes_left_i ( s_tx_ch_bytes_left[CH_ID_TX_ETH_FRAME]  ),
 
+        /* interface between udma peripheral and udma core */
         .data_tx_req_o       ( s_tx_ch_req[CH_ID_TX_ETH_FRAME]         ),
         .data_tx_gnt_i       ( s_tx_ch_gnt[CH_ID_TX_ETH_FRAME]         ),
         .data_tx_datasize_o  ( s_tx_ch_datasize[CH_ID_TX_ETH_FRAME]    ),
@@ -1146,7 +1152,7 @@ module udma_subsystem
         .data_rx_valid_o     ( s_rx_ch_valid[CH_ID_RX_ETH_FRAME]       ),
         .data_rx_ready_i     ( s_rx_ch_ready[CH_ID_RX_ETH_FRAME]       ),
 
-        // udma <-> ethernet mac
+        /* interface between udma peripheral <-> ethernet mac */
         .eth_tx_axis_tdata(eth_tx_axis_tdata),
         .eth_tx_axis_tvalid(eth_tx_axis_tvalid),
         .eth_tx_axis_tready(eth_tx_axis_tready),
@@ -1157,6 +1163,11 @@ module udma_subsystem
         .eth_rx_axis_tvalid(eth_rx_axis_tvalid),
         .eth_rx_axis_tready(eth_rx_axis_tready),
         .eth_rx_axis_tlast(eth_rx_axis_tlast),
-        .eth_rx_axis_tuser(eth_rx_axis_tuser)
+        .eth_rx_axis_tuser(eth_rx_axis_tuser),
+
+        /* ethernet clock and reset is required for dc fifo in udma peripheral */
+        .clk_eth(eth_clk),
+        .clk_eth90(clk_eth90),
+        .rst_eth(rst_eth)
     );
 endmodule
