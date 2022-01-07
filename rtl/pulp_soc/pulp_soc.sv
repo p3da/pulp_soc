@@ -1162,7 +1162,7 @@ module pulp_soc import dm::*; #(
         .rx_fifo_good_frame(),
         .speed(),
 
-        .ifg_delay(12)
+        .ifg_delay(8'd12)
     );
 
 endmodule
