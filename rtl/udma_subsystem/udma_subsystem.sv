@@ -203,11 +203,13 @@ module udma_subsystem
 
     initial begin
     $display("
-      [N_RX_CHANNELS]: %d\n,
-      [N_TX_CHANNELS]: %d\n,
-      [N_PERIPHS]: %d\n,
-      [CH_ID_TX_ETH_FRAME]: %d\n,
-      [CH_ID_RX_ETH_FRAME]: %d\n,
+      \n
+      [ETH_FRAME UDMA config]:
+      [N_RX_CHANNELS]: %d,
+      [N_TX_CHANNELS]: %d,
+      [N_PERIPHS]: %d,
+      [CH_ID_TX_ETH_FRAME]: %d,
+      [CH_ID_RX_ETH_FRAME]: %d,
       [PER_ID_ETH_FRAME]: %d",
       N_RX_CHANNELS,
       N_TX_CHANNELS,
@@ -215,6 +217,22 @@ module udma_subsystem
       CH_ID_TX_ETH_FRAME,
       CH_ID_RX_ETH_FRAME,
       PER_ID_ETH_FRAME
+    );
+    $display("
+      \n
+      [HYPER UDMA config]:
+      [N_RX_CHANNELS]: %d,
+      [N_TX_CHANNELS]: %d,
+      [N_PERIPHS]: %d,
+      [CH_ID_TX_HYPER]: %d,
+      [CH_ID_RX_HYPER]: %d,
+      [PER_ID_HYPER]: %d",
+      N_RX_CHANNELS,
+      N_TX_CHANNELS,
+      N_PERIPHS,
+      CH_ID_TX_HYPER,
+      CH_ID_RX_HYPER,
+      PER_ID_HYPER
     );
     end
 
@@ -1166,7 +1184,7 @@ module udma_subsystem
         .eth_rx_axis_tuser(eth_rx_axis_tuser),
 
         /* ethernet clock and reset is required for dc fifo in udma peripheral */
-        .clk_eth(eth_clk),
+        .clk_eth(clk_eth),
         .clk_eth90(clk_eth90),
         .rst_eth(rst_eth)
     );

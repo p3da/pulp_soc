@@ -521,7 +521,7 @@ module soc_peripherals #(
         .eth_rx_axis_tlast(eth_rx_axis_tlast),
         .eth_rx_axis_tuser(eth_rx_axis_tuser),
 
-        .clk_eth(eth_clk),
+        .clk_eth(clk_eth),
         .clk_eth90(clk_eth90),
         .rst_eth(rst_eth)
 
