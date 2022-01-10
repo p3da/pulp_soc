@@ -1129,9 +1129,9 @@ module pulp_soc import dm::*; #(
     ) eth_mac_inst (
         .gtx_clk(clk_eth),
         .gtx_clk90(clk_eth90),
-        .gtx_rst(rst_eth),
+        .gtx_rst(~rst_eth), // high-active reset
         .logic_clk(clk_eth),
-        .logic_rst(rst_eth),
+        .logic_rst(~rst_eth), // high-active reset
 
         .tx_axis_tdata(eth_tx_axis_tdata),
         .tx_axis_tvalid(eth_tx_axis_tvalid),
