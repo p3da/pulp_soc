@@ -201,40 +201,40 @@ module udma_subsystem
     localparam PER_ID_HYPER   = PER_ID_FILTER + N_FILTER ;
     localparam PER_ID_ETH_FRAME =  PER_ID_HYPER  + N_HYPER  + N_CH_HYPER;
 
-    initial begin
-    $display("
-      \n
-      [ETH_FRAME UDMA config]:
-      [N_RX_CHANNELS]: %d,
-      [N_TX_CHANNELS]: %d,
-      [N_PERIPHS]: %d,
-      [CH_ID_TX_ETH_FRAME]: %d,
-      [CH_ID_RX_ETH_FRAME]: %d,
-      [PER_ID_ETH_FRAME]: %d",
-      N_RX_CHANNELS,
-      N_TX_CHANNELS,
-      N_PERIPHS,
-      CH_ID_TX_ETH_FRAME,
-      CH_ID_RX_ETH_FRAME,
-      PER_ID_ETH_FRAME
-    );
-    $display("
-      \n
-      [HYPER UDMA config]:
-      [N_RX_CHANNELS]: %d,
-      [N_TX_CHANNELS]: %d,
-      [N_PERIPHS]: %d,
-      [CH_ID_TX_HYPER]: %d,
-      [CH_ID_RX_HYPER]: %d,
-      [PER_ID_HYPER]: %d",
-      N_RX_CHANNELS,
-      N_TX_CHANNELS,
-      N_PERIPHS,
-      CH_ID_TX_HYPER,
-      CH_ID_RX_HYPER,
-      PER_ID_HYPER
-    );
-    end
+    // initial begin
+    // $display("
+    //   \n
+    //   [ETH_FRAME UDMA config]:
+    //   [N_RX_CHANNELS]: %d,
+    //   [N_TX_CHANNELS]: %d,
+    //   [N_PERIPHS]: %d,
+    //   [CH_ID_TX_ETH_FRAME]: %d,
+    //   [CH_ID_RX_ETH_FRAME]: %d,
+    //   [PER_ID_ETH_FRAME]: %d",
+    //   N_RX_CHANNELS,
+    //   N_TX_CHANNELS,
+    //   N_PERIPHS,
+    //   CH_ID_TX_ETH_FRAME,
+    //   CH_ID_RX_ETH_FRAME,
+    //   PER_ID_ETH_FRAME
+    // );
+    // $display("
+    //   \n
+    //   [HYPER UDMA config]:
+    //   [N_RX_CHANNELS]: %d,
+    //   [N_TX_CHANNELS]: %d,
+    //   [N_PERIPHS]: %d,
+    //   [CH_ID_TX_HYPER]: %d,
+    //   [CH_ID_RX_HYPER]: %d,
+    //   [PER_ID_HYPER]: %d",
+    //   N_RX_CHANNELS,
+    //   N_TX_CHANNELS,
+    //   N_PERIPHS,
+    //   CH_ID_TX_HYPER,
+    //   CH_ID_RX_HYPER,
+    //   PER_ID_HYPER
+    // );
+    // end
 
     logic [N_TX_CHANNELS-1:0] [L2_AWIDTH_NOAL-1 : 0] s_tx_cfg_startaddr;
     logic [N_TX_CHANNELS-1:0]     [TRANS_SIZE-1 : 0] s_tx_cfg_size;
