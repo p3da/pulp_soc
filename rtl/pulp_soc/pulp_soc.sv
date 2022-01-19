@@ -222,7 +222,10 @@ module pulp_soc import dm::*; #(
     input logic         clk_eth90,
     input logic         rst_eth,
 
-		output logic [7:0]  led
+		output logic [7:0]  led,
+
+    input logic         clk_ptp,
+    input logic         rst_ptp
 );
 
     localparam NB_L2_BANKS = `NB_L2_CHANNELS;
@@ -379,6 +382,25 @@ module pulp_soc import dm::*; #(
     logic eth_rx_axis_tready;
     logic eth_rx_axis_tlast;
     logic eth_rx_axis_tuser;
+
+    // ptp clock <-> ptp perout
+    logic ptp_ts_step;
+    logic output_pps;
+    logic [95:0] ptp_ts_96;
+    logic ptp_perout_enable_reg = 1'b1;
+    /* todo attach to e.g. led */
+    logic ptp_perout_pulse;
+
+    // ptp clock <-> udma
+    logic [95:0] ptp_rx_ts_axis_tdata;
+    logic  ptp_rx_ts_axis_tvalid;
+    logic  ptp_rx_ts_axis_tready;
+
+    logic [95:0] ptp_tx_ts_axis_tdata;
+    logic  ptp_tx_ts_axis_tvalid;
+    logic  ptp_tx_ts_axis_tready;
+
+
 
 
     APB_BUS                s_apb_eu_bus ();
@@ -756,8 +778,18 @@ module pulp_soc import dm::*; #(
 
         .clk_eth(clk_eth),
         .clk_eth90(clk_eth90),
-        .rst_eth(rst_eth)
+        .rst_eth(rst_eth),
 
+        .ptp_rx_ts_axis_tdata(ptp_rx_ts_axis_tdata),
+        .ptp_rx_ts_axis_tvalid(ptp_rx_ts_axis_tvalid),
+        .ptp_rx_ts_axis_tready(ptp_rx_ts_axis_tready),
+
+        .ptp_tx_ts_axis_tdata(ptp_tx_ts_axis_tdata),
+        .ptp_tx_ts_axis_tvalid(ptp_tx_ts_axis_tvalid),
+        .ptp_tx_ts_axis_tready(ptp_tx_ts_axis_tready),
+
+        .clk_ptp(clk_ptp),
+        .rst_ptp(rst_ptp)
     );
 
     cdc_fifo_gray_src #(
@@ -1096,7 +1128,7 @@ module pulp_soc import dm::*; #(
 		// 		 */
 		// 		.clk_125mhz(clk_eth),
 		// 		.clk90_125mhz(clk_eth90),
-		// 		.rst_125mhz(rst_eth),
+		// 		.rst_125mhz(~rst_eth),
     //
 		// 		/**
 		// 		 * payload of udp packets is printed to leds
@@ -1115,6 +1147,63 @@ module pulp_soc import dm::*; #(
 		//     .phy_reset_n(phy_reset_n)
 		// );
 
+    // this instance of eth_mac_1g_rgmii_fifo only works with the original version of the p3da/verilog-ethernet version
+    // but not with the modified version p3da/verilog-ethernet_ptp
+    // eth_mac_1g_rgmii_fifo #(
+    //     .TARGET(MAC_TARGET),
+    //     .IODDR_STYLE("IODDR"),
+    //     .CLOCK_INPUT_STYLE("BUFR"),
+    //     .USE_CLK90("TRUE"),
+    //     .ENABLE_PADDING(1),
+    //     .MIN_FRAME_LENGTH(64),
+    //     .TX_FIFO_DEPTH(4096),
+    //     .TX_FRAME_FIFO(1),
+    //     .RX_FIFO_DEPTH(4096),
+    //     .RX_FRAME_FIFO(1)
+    // ) eth_mac_inst (
+    //     .gtx_clk(clk_eth),
+    //     .gtx_clk90(clk_eth90),
+    //     .gtx_rst(~rst_eth), // high-active reset
+    //     .logic_clk(clk_eth),
+    //     .logic_rst(~rst_eth), // high-active reset
+    //
+    //     .tx_axis_tdata(eth_tx_axis_tdata),
+    //     .tx_axis_tvalid(eth_tx_axis_tvalid),
+    //     .tx_axis_tready(eth_tx_axis_tready),
+    //     .tx_axis_tlast(eth_tx_axis_tlast),
+    //     .tx_axis_tuser(eth_tx_axis_tuser),
+    //
+    //     .rx_axis_tdata(eth_rx_axis_tdata),
+    //     .rx_axis_tvalid(eth_rx_axis_tvalid),
+    //     .rx_axis_tready(eth_rx_axis_tready),
+    //     .rx_axis_tlast(eth_rx_axis_tlast),
+    //     .rx_axis_tuser(eth_rx_axis_tuser),
+    //
+    //     .rgmii_rx_clk(phy_rx_clk),
+    //     .rgmii_rxd(phy_rxd),
+    //     .rgmii_rx_ctl(phy_rx_ctl),
+    //     .rgmii_tx_clk(phy_tx_clk),
+    //     .rgmii_txd(phy_txd),
+    //     .rgmii_tx_ctl(phy_tx_ctl),
+    //
+    //     .tx_fifo_overflow(),
+    //     .tx_fifo_bad_frame(),
+    //     .tx_fifo_good_frame(),
+    //     .rx_error_bad_frame(),
+    //     .rx_error_bad_fcs(),
+    //     .rx_fifo_overflow(),
+    //     .rx_fifo_bad_frame(),
+    //     .rx_fifo_good_frame(),
+    //     .speed(),
+    //
+    //     .ifg_delay(8'd12)
+    // );
+
+
+
+
+    assign phy_reset_n = !rst_125mhz;
+
     eth_mac_1g_rgmii_fifo #(
         .TARGET(MAC_TARGET),
         .IODDR_STYLE("IODDR"),
@@ -1125,13 +1214,27 @@ module pulp_soc import dm::*; #(
         .TX_FIFO_DEPTH(4096),
         .TX_FRAME_FIFO(1),
         .RX_FIFO_DEPTH(4096),
-        .RX_FRAME_FIFO(1)
+        .RX_FRAME_FIFO(1),
+        .LOGIC_PTP_PERIOD_NS(4'h6),
+        .LOGIC_PTP_PERIOD_FNS(16'h6666),
+        .PTP_PERIOD_NS(4'h6),
+        .PTP_PERIOD_FNS(16'h6666),
+        .PTP_USE_SAMPLE_CLOCK(0),
+        .TX_PTP_TS_ENABLE(1),
+        .RX_PTP_TS_ENABLE(1),
+        .TX_PTP_TS_FIFO_DEPTH(64),
+        .RX_PTP_TS_FIFO_DEPTH(64),
+        .PTP_TS_WIDTH(96),
+        .TX_PTP_TAG_ENABLE(0),
+        .PTP_TAG_WIDTH(16)
     ) eth_mac_inst (
         .gtx_clk(clk_eth),
         .gtx_clk90(clk_eth90),
         .gtx_rst(~rst_eth), // high-active reset
         .logic_clk(clk_eth),
         .logic_rst(~rst_eth), // high-active reset
+
+        .ptp_sample_clk(clk_ptp),
 
         .tx_axis_tdata(eth_tx_axis_tdata),
         .tx_axis_tvalid(eth_tx_axis_tvalid),
@@ -1160,9 +1263,120 @@ module pulp_soc import dm::*; #(
         .rx_fifo_overflow(),
         .rx_fifo_bad_frame(),
         .rx_fifo_good_frame(),
-        .speed(),
 
+        .m_axis_tx_ptp_ts_96(ptp_tx_ts_axis_tdata),
+        .m_axis_tx_ptp_ts_valid(ptp_tx_ts_axis_tvalid),
+        .m_axis_tx_ptp_ts_ready(ptp_tx_ts_axis_tready),
+
+        .m_axis_rx_ptp_ts_96(ptp_rx_ts_axis_tdata),
+        .m_axis_rx_ptp_ts_valid(ptp_rx_ts_axis_tvalid),
+        .m_axis_rx_ptp_ts_ready(ptp_rx_ts_axis_tready),
+
+        .s_axis_tx_ptp_ts_tag(1'b0),
+        .s_axis_tx_ptp_ts_valid(1'b0),
+        .s_axis_tx_ptp_ts_ready(),
+
+        .ptp_ts_96(ptp_ts_96),
+
+        .speed(),
+        .aneg(1'b1),
+        .speed_sel(1'b0),
         .ifg_delay(8'd12)
     );
 
+    parameter PTP_PERIOD_NS_WIDTH = 4;
+    parameter PTP_OFFSET_NS_WIDTH = 32;
+    parameter PTP_FNS_WIDTH = 32;
+    parameter PTP_PERIOD_NS = 4'd4;
+    parameter PTP_PERIOD_FNS = 32'd0;
+
+    // PTP clock
+    ptp_clock #(
+        .PERIOD_NS_WIDTH(PTP_PERIOD_NS_WIDTH),
+        .OFFSET_NS_WIDTH(PTP_OFFSET_NS_WIDTH),
+        .FNS_WIDTH(PTP_FNS_WIDTH),
+        .PERIOD_NS(PTP_PERIOD_NS),
+        .PERIOD_FNS(PTP_PERIOD_FNS),
+        .DRIFT_ENABLE(0)
+    )
+    ptp_clock_inst (
+        .clk(clk_ptp),
+        .rst(~rst_ptp),
+
+        /*
+         * Timestamp inputs for synchronization
+         */
+        .input_ts_96(0),
+        .input_ts_96_valid(0),
+        .input_ts_64(0),
+        .input_ts_64_valid(0),
+
+        /*
+         * Period adjustment
+         */
+        .input_period_ns(0),
+        .input_period_fns(0),
+        .input_period_valid(0),
+
+        /*
+         * Offset adjustment
+         */
+        .input_adj_ns(0),
+        .input_adj_fns(0),
+        .input_adj_count(0),
+        .input_adj_valid(0),
+        .input_adj_active(0),
+
+        /*
+         * Drift adjustment
+         */
+        .input_drift_ns(0),
+        .input_drift_fns(0),
+        .input_drift_rate(0),
+        .input_drift_valid(0),
+
+
+
+        /*
+         * Timestamp outputs
+         */
+        .output_ts_96(ptp_ts_96),
+        .output_ts_64(),
+        .output_ts_step(ptp_ts_step),
+
+        /*
+         * PPS output
+         */
+        .output_pps(output_pps)
+    );
+
+
+    ptp_perout #(
+        .FNS_ENABLE(0),
+        .OUT_START_S(0),
+        .OUT_START_NS(0),
+        .OUT_START_FNS(0),
+        .OUT_PERIOD_S(1),
+        .OUT_PERIOD_NS(0),
+        .OUT_PERIOD_FNS(0),
+        .OUT_WIDTH_S(0),
+        .OUT_WIDTH_NS(500000000),
+        .OUT_WIDTH_FNS(0)
+    )
+    ptp_perout_inst (
+        .clk(clk_ptp),
+        .rst(~rst_ptp),
+        .input_ts_96(ptp_ts_96),
+        .input_ts_step(ptp_ts_step),
+        .enable(ptp_perout_enable_reg),
+        .input_start(),
+        .input_start_valid(),
+        .input_period(),
+        .input_period_valid(),
+        .input_width(),
+        .input_width_valid(),
+        .locked(),
+        .error(),
+        .output_pulse(ptp_perout_pulse)
+    );
 endmodule

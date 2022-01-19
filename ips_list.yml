@@ -115,6 +115,10 @@ udma/udma_eth_frame:
   commit: master
   domain: [soc]
   group: p3da
+udma/udma_ptp_ts:
+  commit: master
+  domain: [soc]
+  group: p3da
 udma_hyper:
   commit: 83ab704f9d1c5f9e5353268c901fe95c36bcea36
   domain: [soc]
@@ -127,7 +131,7 @@ riscv-dbg:
 register_interface:
   commit: v0.3.1
   domain: [soc]
-verilog-ethernet:
-  commit: udpcomplete
+verilog-ethernet_ptp:
+  commit: master
   domain: [soc]
   group: p3da

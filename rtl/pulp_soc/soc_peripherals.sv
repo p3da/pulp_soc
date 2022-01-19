@@ -180,7 +180,18 @@ module soc_peripherals #(
 
     input  logic clk_eth,
     input  logic clk_eth90,
-    input  logic rst_eth
+    input  logic rst_eth,
+
+    input  logic [95:0] ptp_rx_ts_axis_tdata,
+    input  logic ptp_rx_ts_axis_tvalid,
+    output logic ptp_rx_ts_axis_tready,
+
+    input  logic [95:0] ptp_tx_ts_axis_tdata,
+    input  logic ptp_tx_ts_axis_tvalid,
+    output logic ptp_tx_ts_axis_tready,
+
+    input logic clk_ptp,
+    input logic rst_ptp
 );
 
     APB_BUS s_fll_bus ();
@@ -523,7 +534,18 @@ module soc_peripherals #(
 
         .clk_eth(clk_eth),
         .clk_eth90(clk_eth90),
-        .rst_eth(rst_eth)
+        .rst_eth(rst_eth),
+
+        .ptp_rx_ts_axis_tdata(ptp_rx_ts_axis_tdata),
+        .ptp_rx_ts_axis_tvalid(ptp_rx_ts_axis_tvalid),
+        .ptp_rx_ts_axis_tready(ptp_rx_ts_axis_tready),
+
+        .ptp_tx_ts_axis_tdata(ptp_tx_ts_axis_tdata),
+        .ptp_tx_ts_axis_tvalid(ptp_tx_ts_axis_tvalid),
+        .ptp_tx_ts_axis_tready(ptp_tx_ts_axis_tready),
+
+        .clk_ptp(clk_ptp),
+        .rst_ptp(rst_ptp)
 
     );
 
