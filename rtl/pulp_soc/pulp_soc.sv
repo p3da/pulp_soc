@@ -1202,7 +1202,7 @@ module pulp_soc import dm::*; #(
 
 
 
-    assign phy_reset_n = !rst_125mhz;
+    assign phy_reset_n = !rst_eth;
 
     eth_mac_1g_rgmii_fifo #(
         .TARGET(MAC_TARGET),
@@ -1272,7 +1272,7 @@ module pulp_soc import dm::*; #(
         .m_axis_rx_ptp_ts_valid(ptp_rx_ts_axis_tvalid),
         .m_axis_rx_ptp_ts_ready(ptp_rx_ts_axis_tready),
 
-        .s_axis_tx_ptp_ts_tag(1'b0),
+        .s_axis_tx_ptp_ts_tag(16'h0),
         .s_axis_tx_ptp_ts_valid(1'b0),
         .s_axis_tx_ptp_ts_ready(),
 
@@ -1280,7 +1280,7 @@ module pulp_soc import dm::*; #(
 
         .speed(),
         .aneg(1'b1),
-        .speed_sel(1'b0),
+        .speed_sel(2'b0),
         .ifg_delay(8'd12)
     );
 
@@ -1306,34 +1306,34 @@ module pulp_soc import dm::*; #(
         /*
          * Timestamp inputs for synchronization
          */
-        .input_ts_96(0),
-        .input_ts_96_valid(0),
-        .input_ts_64(0),
-        .input_ts_64_valid(0),
+        .input_ts_96(96'h0),
+        .input_ts_96_valid(1'h0),
+        .input_ts_64(64'h0),
+        .input_ts_64_valid(1'h0),
 
         /*
          * Period adjustment
          */
-        .input_period_ns(0),
-        .input_period_fns(0),
-        .input_period_valid(0),
+        .input_period_ns(4'h0),
+        .input_period_fns(32'h0),
+        .input_period_valid(1'h0),
 
         /*
          * Offset adjustment
          */
-        .input_adj_ns(0),
-        .input_adj_fns(0),
-        .input_adj_count(0),
-        .input_adj_valid(0),
-        .input_adj_active(0),
+        .input_adj_ns(32'h0),
+        .input_adj_fns(32'h0),
+        .input_adj_count(16'h0),
+        .input_adj_valid(1'h0),
+        .input_adj_active(),
 
         /*
          * Drift adjustment
          */
-        .input_drift_ns(0),
-        .input_drift_fns(0),
-        .input_drift_rate(0),
-        .input_drift_valid(0),
+        .input_drift_ns(4'h0),
+        .input_drift_fns(32'h0),
+        .input_drift_rate(16'h0),
+        .input_drift_valid(1'h0),
 
 
 

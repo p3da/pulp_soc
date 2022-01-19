@@ -1271,7 +1271,7 @@ module udma_subsystem
     udma_ptp_ts #(
       .L2_AWIDTH_NOAL(L2_AWIDTH_NOAL),
       .TRANS_SIZE(TRANS_SIZE)
-    ) i_ptp_ts_rx (
+    ) i_ptp_ts_tx (
         .sys_clk_i           ( s_clk_periphs_core[PER_ID_PTP_TS_TX]    ),
         .rstn_i              ( sys_resetn_i                            ),
 
