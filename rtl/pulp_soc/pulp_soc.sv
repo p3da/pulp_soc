@@ -1202,7 +1202,7 @@ module pulp_soc import dm::*; #(
 
 
 
-    assign phy_reset_n = !rst_eth;
+    assign phy_reset_n = rst_eth;
 
     eth_mac_1g_rgmii_fifo #(
         .TARGET(MAC_TARGET),
