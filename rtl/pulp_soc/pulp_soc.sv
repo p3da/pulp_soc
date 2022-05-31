@@ -788,8 +788,8 @@ module pulp_soc import dm::*; #(
         .ptp_tx_ts_axis_tvalid(ptp_tx_ts_axis_tvalid),
         .ptp_tx_ts_axis_tready(ptp_tx_ts_axis_tready),
 
-        .clk_ptp(clk_ptp),
-        .rst_ptp(rst_ptp)
+        .clk_ptp(clk_eth),
+        .rst_ptp(rst_eth)
     );
 
     cdc_fifo_gray_src #(
@@ -1334,8 +1334,6 @@ module pulp_soc import dm::*; #(
         .input_drift_fns(32'h0),
         .input_drift_rate(16'h0),
         .input_drift_valid(1'h0),
-
-
 
         /*
          * Timestamp outputs
